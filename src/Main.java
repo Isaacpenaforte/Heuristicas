@@ -8,38 +8,72 @@ public class Main {
         // Configuração dos vetores
         int n = 10;      // Tamanho dos vetores
         double p = 0.3; // Possibilidade de obstaculo por cela
+
         // Posição inicial - (x,y)
-        int x = 0;
-        int y = 0;
-        int[] user = {x, y};
+        int[] user = {0, 0};
+
         // Objetivo - (x,y)
-        int xf = n - 1;
-        int yf = n - 1;
-        int[] ob = {xf, yf};
-        boolean chegou = false;
+        int[] obj = {n - 1, n - 1};
 
-        int[][] grid = GridGenerator.inicializarGrid(n, p); // (Tamanho dos vetores, chance de obstaculo)
+        // Gera a matrix de tamanho NxN
+        int[][] grid = GridGenerator.generateGrid(n, p, obj[0], obj[1], user[0], user[1]); // (Tamanho dos vetores, chance de obstaculo)
 
-        while (!chegou) {
+        System.out.println("Qual busca usar?");
+        System.out.println("1- Hill Climbing Search");
+        System.out.println("2- Best First Search");
+        int escolha = ler.nextInt();
 
-            System.out.println("Sua posicao: (" + user[0] + "," + user[1] + ")");
-            GridGenerator.imprimirGridComUsuario(grid,user);
+        int quantidadeIteracoes=0;
 
-            //user = HillClimbingSearch.verificarCaminhos(user, ob, grid);
-            user = BestFirstSearch.verificarCaminhos(user, ob, grid);
+        if(escolha == 1){
+            HillClimbingSearch hillClimbingSearch = new HillClimbingSearch();
+            while(true){
 
-            if (Arrays.equals(user, ob)) {
-                chegou = true;
-                System.out.println("Objetivo alcançado!");
-            } else {
-                System.out.println("Deseja continuar? (Digite 2 para parar)");
-                String resposta = ler.next();
+                user = hillClimbingSearch.verificarCaminhos(user, obj, grid);
 
-                if (resposta.equals("2")) {
-                    chegou = true;
+                // Contagem de execuções
+                quantidadeIteracoes++;
+
+                // Se verificarCaminhos não obter melhor caminho termina o loop
+                if (user == null){
+                    System.out.println("Nenhum movimento melhor!\nTerminando!");
+                    break;
+                }
+
+                GridGenerator.imprimirGridComUsuario(grid,user);
+
+                // Se a posição do usuário for a mesma do objetivo termina o loop
+                if (Arrays.equals(user, obj)) {
+                    System.out.println("Objetivo alcançado!");
+                    break;
+                }
+            }
+        }else if(escolha == 2){
+            BestFirstSearch bestFirstSearch = new BestFirstSearch(grid);
+            while(true){
+
+                user = bestFirstSearch.verificarCaminhos(user, obj, grid);
+
+                // Contagem de execuções
+                quantidadeIteracoes++;
+
+                // Se verificarCaminhos não obter melhor caminho termina o loop
+                if (user == null){
+                    System.out.println("Nenhum movimento melhor!");
+                    break;
+                }
+
+                GridGenerator.imprimirGridComUsuario(grid,user);
+
+                // Se a posição do usuário for a mesma do objetivo termina o loop
+                if (Arrays.equals(user, obj)) {
+                    System.out.println("Objetivo alcançado!");
+                    break;
                 }
             }
         }
+
+        System.out.println("Número de execuções: "+quantidadeIteracoes);
         System.out.println("Terminou!!");
     }
 
